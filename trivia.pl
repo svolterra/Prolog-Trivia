@@ -22,7 +22,6 @@ starting_graphics(D) :-
     send(D, append, new(Games, button('Video Games'))),
     send(Games, center, point(150, 120)),
     send(Games, size, size(400,100)),
-    send(Games, message, message(@prolog, game_trivia, D)),
 
     send(D, append, new(PopCulture, button('Pop Culture'))),
     send(PopCulture, center, point(150, 240)),
@@ -32,51 +31,52 @@ starting_graphics(D) :-
     send(Geography, center, point(150, 360)),
     send(Geography, size, size(400,100)),
 
-    send(Games, message, message(@prolog, games_clicked, TitleText, CategoryText, Games, PopCulture, Geography)),
-    send(PopCulture, message, message(@prolog, pop_clicked, TitleText, CategoryText, Games, PopCulture, Geography)),
-    send(Geography, message, message(@prolog, geo_clicked, TitleText, CategoryText, Games, PopCulture, Geography)).
+    send(Games, message, message(@prolog, games_clicked, D, TitleText, CategoryText, Games, PopCulture, Geography)),
+    send(PopCulture, message, message(@prolog, pop_clicked, D, TitleText, CategoryText, Games, PopCulture, Geography)),
+    send(Geography, message, message(@prolog, geo_clicked, D, TitleText, CategoryText, Games, PopCulture, Geography)).
 
 
 
 games_clicked(D, TitleText, CategoryText, Games, PopCulture, Geography) :-
     video_game_questions(Questions),
     random_member(Question, Questions),
-    Question = question(QuestionText, Choices, CorrectIndex),
+    Question = (QuestionText, Choices, CorrectIndex),
+    writeln(QuestionText),
 
     send(TitleText, string, QuestionText),
     send(CategoryText, string, 'Choose the Correct Answer.'),
 
-    [Choice1, Choice2, Choice3] = Choices,
+    Choices = [Choice1, Choice2, Choice3],
 
     send(Games, label, Choice1),
-    send(Games, message, message(@prolog, check_answer, CorrectIndex, 1, D, CategoryText)),
+    send(Games, message, message(@prolog, check_answer, D, CorrectIndex, 1, CategoryText)),
 
     send(PopCulture, label, Choice2),
-    send(PopCulture, message, message(@prolog, check_answer, CorrectIndex, 2, D, CategoryText)),
+    send(PopCulture, message, message(@prolog, check_answer, D, CorrectIndex, 2, D, CategoryText)),
 
     send(Geography, label, Choice3),
-    send(Geography, message, message(@prolog, check_answer, CorrectIndex, 3, D, CategoryText)).
+    send(Geography, message, message(@prolog, check_answer, D, CorrectIndex, 3, D, CategoryText)).
 
 
 
 pop_clicked(D, TitleText, CategoryText, Games, PopCulture, Geography) :-
     pop_culture_questions(Questions),
     random_member(Question, Questions),
-    Question = question(QuestionText, Choices, CorrectIndex),
+    Question = (QuestionText, Choices, CorrectIndex),
 
     send(TitleText, string, QuestionText),
     send(CategoryText, string, 'Choose the Correct Answer.'),
 
-    [Choice1, Choice2, Choice3] = Choices,
+    Choices = [Choice1, Choice2, Choice3],
 
     send(Games, label, Choice1),
-    send(Games, message, message(@prolog, check_answer, CorrectIndex, 1, D, CategoryText)),
+    send(Games, message, message(@prolog, check_answer, D, CorrectIndex, 1, CategoryText)),
 
     send(PopCulture, label, Choice2),
-    send(PopCulture, message, message(@prolog, check_answer, CorrectIndex, 2, D, CategoryText)),
+    send(PopCulture, message, message(@prolog, check_answer, D, CorrectIndex, 2, CategoryText)),
 
     send(Geography, label, Choice3),
-    send(Geography, message, message(@prolog, check_answer, CorrectIndex, 3, D, CategoryText)).
+    send(Geography, message, message(@prolog, check_answer, D, CorrectIndex, 3, CategoryText)).
 
 geo_clicked(D, TitleText, CategoryText, Games, PopCulture, Geography) :-
     geography_questions(Questions),
@@ -86,19 +86,19 @@ geo_clicked(D, TitleText, CategoryText, Games, PopCulture, Geography) :-
     send(TitleText, string, QuestionText),
     send(CategoryText, string, 'Choose the Correct Answer.'),
 
-    [Choice1, Choice2, Choice3] = Choices,
+    Choices = [Choice1, Choice2, Choice3],
 
     send(Games, label, Choice1),
-    send(Games, message, message(@prolog, check_answer, CorrectIndex, 1, D, CategoryText)),
+    send(Games, message, message(@prolog, check_answer, D, CorrectIndex, 1, CategoryText)),
 
     send(PopCulture, label, Choice2),
-    send(PopCulture, message, message(@prolog, check_answer, CorrectIndex, 2, D, CategoryText)),
+    send(PopCulture, message, message(@prolog, check_answer, D, CorrectIndex, 2, CategoryText)),
 
     send(Geography, label, Choice3),
-    send(Geography, message, message(@prolog, check_answer, CorrectIndex, 3, D, CategoryText)).
+    send(Geography, message, message(@prolog, check_answer, D, CorrectIndex, 3, CategoryText)).
 
 
-check_answer(CorrectIndex, ChosenIndex, D, CategoryText) :-
+check_answer(D, CorrectIndex, ChosenIndex, CategoryText) :-
     (   CorrectIndex = ChosenIndex
     ->  send(CategoryText, string, 'Correct!')
     ;   send(CategoryText, string, 'Incorrect!')
@@ -107,6 +107,8 @@ check_answer(CorrectIndex, ChosenIndex, D, CategoryText) :-
     sleep(2),
     send(D, destroy),
     main.
+
+
 
 video_game_questions([
     ('Who is the main protagonist in the "Legend of Zelda" series?', ["Ganondorf", "Zelda", "Link"], 2),
