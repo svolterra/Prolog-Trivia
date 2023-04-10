@@ -32,60 +32,118 @@ starting_graphics(D) :-
     send(Geography, center, point(150, 360)),
     send(Geography, size, size(400,100)),
 
-    send(Games, message, message(@prolog, pop_clicked, D, TitleText, CategoryText, Games, PopCulture, Geography)),
-    send(PopCulture, message, message(@prolog, pop_clicked, D, TitleText, CategoryText, Games, PopCulture, Geography)),
-    send(Geography, message, message(@prolog, geo_clicked, D, TitleText, CategoryText, Games, PopCulture, Geography)).
+    send(Games, message, message(@prolog, games_clicked, TitleText, CategoryText, Games, PopCulture, Geography)),
+    send(PopCulture, message, message(@prolog, pop_clicked, TitleText, CategoryText, Games, PopCulture, Geography)),
+    send(Geography, message, message(@prolog, geo_clicked, TitleText, CategoryText, Games, PopCulture, Geography)).
 
 
-games_clicked(TitleText, CategoryText, Games, PopCulture, Geography) :-
-    send(TitleText, string, 'What Company Developed The Last of Us?'),
+
+games_clicked(D, TitleText, CategoryText, Games, PopCulture, Geography) :-
+    video_game_questions(Questions),
+    random_member(Question, Questions),
+    Question = question(QuestionText, Choices, CorrectIndex),
+
+    send(TitleText, string, QuestionText),
     send(CategoryText, string, 'Choose the Correct Answer.'),
-    
-    send(Games, label, 'Clicked'),
-    send(Games, center, point(150, 120)),
-    send(Games, size, size(400,100)),
 
-    send(PopCulture, label, 'Clicked'), 
-    send(PopCulture, center, point(150, 240)),
-    send(PopCulture, size, size(400,100)),
-    
-    send(Geography, label, 'Clicked'),
-    send(Geography, center, point(150, 360)),
-    send(Geography, size, size(400,100)).
+    [Choice1, Choice2, Choice3] = Choices,
+
+    send(Games, label, Choice1),
+    send(Games, message, message(@prolog, check_answer, CorrectIndex, 1, D, CategoryText)),
+
+    send(PopCulture, label, Choice2),
+    send(PopCulture, message, message(@prolog, check_answer, CorrectIndex, 2, D, CategoryText)),
+
+    send(Geography, label, Choice3),
+    send(Geography, message, message(@prolog, check_answer, CorrectIndex, 3, D, CategoryText)).
+
 
 
 pop_clicked(D, TitleText, CategoryText, Games, PopCulture, Geography) :-
-    send(TitleText, string, 'Where is Justin Bieber From?'),
+    pop_culture_questions(Questions),
+    random_member(Question, Questions),
+    Question = question(QuestionText, Choices, CorrectIndex),
+
+    send(TitleText, string, QuestionText),
     send(CategoryText, string, 'Choose the Correct Answer.'),
 
-    send(Games, label, 'Clicked'),
-    send(Games, center, point(150, 120)),
-    send(Games, size, size(400,100)),
+    [Choice1, Choice2, Choice3] = Choices,
 
-    send(PopCulture, label, 'Clicked'), 
-    send(PopCulture, center, point(150, 240)),
-    send(PopCulture, size, size(400,100)),
-    
-    send(Geography, label, 'Clicked'),
-    send(Geography, center, point(150, 360)),
-    send(Geography, size, size(400,100)).
+    send(Games, label, Choice1),
+    send(Games, message, message(@prolog, check_answer, CorrectIndex, 1, D, CategoryText)),
 
-geo_clicked(TitleText, CategoryText, Games, PopCulture, Geography) :-
-    send(TitleText, string, 'Where is Europe?'),
+    send(PopCulture, label, Choice2),
+    send(PopCulture, message, message(@prolog, check_answer, CorrectIndex, 2, D, CategoryText)),
+
+    send(Geography, label, Choice3),
+    send(Geography, message, message(@prolog, check_answer, CorrectIndex, 3, D, CategoryText)).
+
+geo_clicked(D, TitleText, CategoryText, Games, PopCulture, Geography) :-
+    geography_questions(Questions),
+    random_member(Question, Questions),
+    Question = question(QuestionText, Choices, CorrectIndex),
+
+    send(TitleText, string, QuestionText),
     send(CategoryText, string, 'Choose the Correct Answer.'),
 
-    send(Games, label, 'Clicked'),
-    send(Games, center, point(150, 120)),
-    send(Games, size, size(400,100)),
+    [Choice1, Choice2, Choice3] = Choices,
 
-    send(PopCulture, label, 'Clicked'), 
-    send(PopCulture, center, point(150, 240)),
-    send(PopCulture, size, size(400,100)),
-    
-    send(Geography, label, 'Clicked'),
-    send(Geography, center, point(150, 360)),
-    send(Geography, size, size(400,100)).
+    send(Games, label, Choice1),
+    send(Games, message, message(@prolog, check_answer, CorrectIndex, 1, D, CategoryText)),
 
-    
+    send(PopCulture, label, Choice2),
+    send(PopCulture, message, message(@prolog, check_answer, CorrectIndex, 2, D, CategoryText)),
+
+    send(Geography, label, Choice3),
+    send(Geography, message, message(@prolog, check_answer, CorrectIndex, 3, D, CategoryText)).
+
+
+check_answer(CorrectIndex, ChosenIndex, D, CategoryText) :-
+    (   CorrectIndex = ChosenIndex
+    ->  send(CategoryText, string, 'Correct!')
+    ;   send(CategoryText, string, 'Incorrect!')
+    ),
+    % Reset the game after a brief pause
+    sleep(2),
+    send(D, destroy),
+    main.
+
+video_game_questions([
+    ('Who is the main protagonist in the "Legend of Zelda" series?', ["Ganondorf", "Zelda", "Link"], 2),
+    ('What is the highest-selling video game of all time?', ["Minecraft", "Wii Sports", "Grand Theft Auto V"], 1),
+    ('Who is the main character in the "Final Fantasy VII" game?', ["Zidane Tribal", "Cloud Strife", "Tidus"], 2),
+    ('Who is the main character in the "Devil May Cry" series?', ["Vergil", "Nero", "Dante"], 3),
+    ('Who is the main character in the "Max Payne" series?', ["Mona Sax", "Alex Balder", "Max Payne"], 3),
+    ('Who is the main character in the "Half-Life" series?', ["Gordon Freeman", "Alyx Vance", "Dr. Wallace Breen"], 1),
+    ('Who is the main character in the "Red Dead Redemption" series?', ["John Marston", "Arthur Morgan", "Dutch van der Linde"], 2),
+    ('What material is used to make a Nether Portal in Minecraft?', ["Obsidian", "Netherrack", "Soul Sand"], 1)
+]).
+
+pop_culture_questions([
+    ('Who played the character of Luke Skywalker in the original "Star Wars" trilogy?', ["Mark Hamill", "Harrison Ford", "Carrie Fisher"], 1),
+    ('What is the name of the lead singer of the band Coldplay?', ["Chris Martin", "Guy Berryman", "Jonny Buckland"], 1),
+    ('What is the name of the fictional city where Batman operates in the DC Comics universe?', ["Metropolis", "Gotham City", "Central City"], 2),
+    ('What is the name of the high school where "Beverly Hills, 90210" takes place?', ["West Beverly High School", "Beverly Hills High School", "Hollywood High School"], 2),
+    ('What is the name of the main character in the "Harry Potter" book series?', ["Hermione Granger", "Ron Weasley", "Harry Potter"], 3),
+    ('What is the name of the fictional African country that Black Panther is from in the Marvel Comics universe?', ["Wakanda", "Zamunda", "Genosha"], 1),
+    ('Who played the character of Walter White in the TV series "Breaking Bad"?', ["Bryan Cranston", "Aaron Paul", "Giancarlo Esposito"], 1),
+    ('What is the name of the fictional town where "Stranger Things" takes place?', ["Hawkins", "Derry", "Westeros"], 1),
+    ('Who is the lead actress in the TV series "Friends"?', ["Jennifer Aniston", "Courteney Cox", "Lisa Kudrow"], 1),
+    ('What is the name of the fictional continent where the TV series "Game of Thrones" takes place?', ["Essos", "Westeros", "Sothoryos"], 2)
+]).
+
+geography_questions([
+    ('What is the capital of Brazil?', ["São Paulo", "Rio de Janeiro", "Brasília"], 3),
+    ('What is the largest country by land area in the world?', ["Russia", "China", "Canada"], 1),
+    ('What is the largest continent in the world?', ["Asia", "Africa", "North America"], 1),
+    ('What is the name of the highest mountain in Africa?', ["Mount Everest", "Kilimanjaro", "Denali"], 2),
+    ('What is the capital of Japan?', ["Kyoto", "Osaka", "Tokyo"], 3),
+    ('What is the longest river in South America?', ["Amazon River", "Orinoco River", "Paraná River"], 1),
+    ('What is the smallest country by land area in the world?', ["Monaco", "San Marino", "Vatican City"], 3),
+    ('What is the name of the largest desert in the world?', ["Gobi Desert", "Sahara Desert", "Arabian Desert"], 2),
+    ('What is the name of the strait that separates Asia and North America?', ["Bering Strait", "Strait of Hormuz", "Strait of Malacca"], 1),
+    ('What is the capital of Australia?', ["Sydney", "Melbourne", "Canberra"], 3)
+]).
+
 
     
