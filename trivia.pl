@@ -17,24 +17,34 @@ starting_graphics(D) :-
 
     send(D, append, new(CategoryText, text('Please Choose a Category!', center))),
     send(CategoryText, center, point(300, 65)),
-    send(CategoryText, font, font(helvetica, normal, 12)),
+    send(CategoryText, font, font(helvetica, normal, 13)),
 
     send(D, append, new(Games, button('Video Games'))),
-    send(Games, center, point(150, 120)),
-    send(Games, size, size(400,100)),
+    format_game_button(Games),
 
     send(D, append, new(PopCulture, button('Pop Culture'))),
-    send(PopCulture, center, point(150, 240)),
-    send(PopCulture, size, size(400,100)),
+    format_pop_button(PopCulture),
 
     send(D, append, new(Geography, button('Geography'))),
-    send(Geography, center, point(150, 360)),
-    send(Geography, size, size(400,100)),
+    format_geo_button(Geography),
 
     send(Games, message, message(@prolog, games_clicked, D, TitleText, CategoryText, Games, PopCulture, Geography, 0)),
     send(PopCulture, message, message(@prolog, pop_clicked, D, TitleText, CategoryText, Games, PopCulture, Geography, 0)),
     send(Geography, message, message(@prolog, geo_clicked, D, TitleText, CategoryText, Games, PopCulture, Geography, 0)).
 
+format_game_button(Games) :-
+    send(Games, position, point(120, 120)),
+    send(Games, size, size(400,100)).
+
+
+format_pop_button(PopCulture) :-
+    send(PopCulture, position, point(120, 240)),
+    send(PopCulture, size, size(400,100)).
+
+
+format_geo_button(Geography) :-
+    send(Geography, position, point(120, 360)),
+    send(Geography, size, size(400,100)).
 
 
 games_clicked(D, TitleText, CategoryText, Games, PopCulture, Geography, QuestionNumber) :-
@@ -49,13 +59,16 @@ games_clicked(D, TitleText, CategoryText, Games, PopCulture, Geography, Question
 
     send(Games, label, Choice1),
     send(Games, message, message(@prolog, check_answer_games, D, TitleText, CategoryText, Games, PopCulture, Geography, CorrectIndex, 1, QuestionNumber)),
+    format_game_button(Games),
+
 
     send(PopCulture, label, Choice2),
     send(PopCulture, message, message(@prolog, check_answer_games, D, TitleText, CategoryText, Games, PopCulture, Geography, CorrectIndex, 2, QuestionNumber)),
+    format_pop_button(PopCulture),
 
     send(Geography, label, Choice3),
-    send(Geography, message, message(@prolog, check_answer_games, D, TitleText, CategoryText, Games, PopCulture, Geography, CorrectIndex, 3, QuestionNumber)).
-
+    send(Geography, message, message(@prolog, check_answer_games, D, TitleText, CategoryText, Games, PopCulture, Geography, CorrectIndex, 3, QuestionNumber)),
+    format_geo_button(Geography).
 
 
 
@@ -71,12 +84,15 @@ pop_clicked(D, TitleText, CategoryText, Games, PopCulture, Geography, QuestionNu
 
     send(Games, label, Choice1),
     send(Games, message, message(@prolog, check_answer_pop, D, TitleText, CategoryText, Games, PopCulture, Geography, CorrectIndex, 1, QuestionNumber)),
+    format_game_button(Games),
 
     send(PopCulture, label, Choice2),
     send(PopCulture, message, message(@prolog, check_answer_pop, D, TitleText, CategoryText, Games, PopCulture, Geography, CorrectIndex, 2, QuestionNumber)),
+    format_pop_button(PopCulture),
 
     send(Geography, label, Choice3),
-    send(Geography, message, message(@prolog, check_answer_pop, D, TitleText, CategoryText, Games, PopCulture, Geography, CorrectIndex, 3, QuestionNumber)).
+    send(Geography, message, message(@prolog, check_answer_pop, D, TitleText, CategoryText, Games, PopCulture, Geography, CorrectIndex, 3, QuestionNumber)),
+    format_geo_button(Geography).
 
 geo_clicked(D, TitleText, CategoryText, Games, PopCulture, Geography, QuestionNumber) :-
     geography_questions(Questions),
@@ -90,38 +106,39 @@ geo_clicked(D, TitleText, CategoryText, Games, PopCulture, Geography, QuestionNu
 
     send(Games, label, Choice1),
     send(Games, message, message(@prolog, check_answer_geo, D, TitleText, CategoryText, Games, PopCulture, Geography, CorrectIndex, 1, QuestionNumber)),
+    format_game_button(Games),
 
     send(PopCulture, label, Choice2),
     send(PopCulture, message, message(@prolog, check_answer_geo, D, TitleText, CategoryText, Games, PopCulture, Geography, CorrectIndex, 2, QuestionNumber)),
+    format_pop_button(PopCulture),
 
     send(Geography, label, Choice3),
-    send(Geography, message, message(@prolog, check_answer_geo, D, TitleText, CategoryText, Games, PopCulture, Geography, CorrectIndex, 3, QuestionNumber)).
+    send(Geography, message, message(@prolog, check_answer_geo, D, TitleText, CategoryText, Games, PopCulture, Geography, CorrectIndex, 3, QuestionNumber)),
+    format_geo_button(Geography).
 
 
 check_answer_games(D, TitleText, CategoryText, Games, PopCulture, Geography, CorrectIndex, ChosenIndex, QuestionNumber) :-
-    (   CorrectIndex = ChosenIndex
+    (   ChosenIndex == CorrectIndex
     ->  send(CategoryText, string, 'Correct!')
     ;   send(CategoryText, string, 'Incorrect!')
     ),
-    % Reset the game after a brief pause
+
     NewQuestionNumber is QuestionNumber + 1,
     games_clicked(D, TitleText, CategoryText, Games, PopCulture, Geography, NewQuestionNumber).
 
 check_answer_pop(D, TitleText, CategoryText, Games, PopCulture, Geography, CorrectIndex, ChosenIndex, QuestionNumber) :-
-    (   CorrectIndex = ChosenIndex
+    (   ChosenIndex == CorrectIndex
     ->  send(CategoryText, string, 'Correct!')
     ;   send(CategoryText, string, 'Incorrect!')
     ),
-    % Reset the game after a brief pause
     NewQuestionNumber is QuestionNumber + 1,
     pop_clicked(D, TitleText, CategoryText, Games, PopCulture, Geography, NewQuestionNumber).
 
 check_answer_geo(D, TitleText, CategoryText, Games, PopCulture, Geography, CorrectIndex, ChosenIndex, QuestionNumber) :-
-    (   CorrectIndex = ChosenIndex
+    (   ChosenIndex == CorrectIndex
     ->  send(CategoryText, string, 'Correct!')
     ;   send(CategoryText, string, 'Incorrect!')
     ),
-    % Reset the game after a brief pause
     NewQuestionNumber is QuestionNumber + 1,
     geo_clicked(D, TitleText, CategoryText, Games, PopCulture, Geography, NewQuestionNumber).
 
@@ -162,6 +179,3 @@ geography_questions([
     ('What is the name of the strait that separates Asia and North America?', ["Bering Strait", "Strait of Hormuz", "Strait of Malacca"], 1),
     ('What is the capital of Australia?', ["Sydney", "Melbourne", "Canberra"], 3)
 ]).
-
-
-    
