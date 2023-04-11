@@ -2,26 +2,27 @@
 
 main :- 
     new(D, dialog('Trivia')),
-    send(D, size, size(600, 600)),
+    send(D, size, size(600, 700)),
     send(D, open),
     starting_graphics(D).
 
-   
+
+ % Renders the initial category picking menu  
 starting_graphics(D) :-
     send(D, append, new(EndButton, button('End Game', message(D, destroy)))),
-    send(EndButton, center, point(300, 550)),
+    send(EndButton, center, point(310, 650)),
 
     send(D, append, new(TitleText, text('Welcome To The World Trivia Quiz!', center))),
-    send(TitleText, center, point(300, 25)),
+    send(TitleText, center, point(300, 80)),
     send(TitleText, font, font(helvetica, normal, 16)),
 
     send(D, append, new(ScoreText, text(''))),
-    send(ScoreText, position, point(100, 50)),
-    send(ScoreText, font, font(helvetica, normal, 16)),
+    send(ScoreText, position, point(285, 20)),
+    send(ScoreText, font, font(helvetica, normal, 13)),
     
     send(D, append, new(CategoryText, text('Please Choose a Category!', center))),
-    send(CategoryText, center, point(300, 65)),
-    send(CategoryText, font, font(helvetica, normal, 13)),
+    send(CategoryText, center, point(300, 120)),
+    send(CategoryText, font, font(helvetica, normal, 12)),
 
     send(D, append, new(Games, button('Video Games'))),
     format_game_button(Games),
@@ -36,22 +37,23 @@ starting_graphics(D) :-
     send(PopCulture, message, message(@prolog, pop_clicked, D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, 0, 0)),
     send(Geography, message, message(@prolog, geo_clicked, D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, 0, 0)).
 
-%All of these are to format the buttons to the correct positions
+
+% The following predicates format the buttons to the correct positions
 format_game_button(Games) :-
-    send(Games, position, point(120, 120)),
+    send(Games, position, point(110, 170)),
     send(Games, size, size(400,100)).
 
-
 format_pop_button(PopCulture) :-
-    send(PopCulture, position, point(120, 240)),
+    send(PopCulture, position, point(110, 290)),
     send(PopCulture, size, size(400,100)).
 
-
 format_geo_button(Geography) :-
-    send(Geography, position, point(120, 360)),
+    send(Geography, position, point(110, 410)),
     send(Geography, size, size(400,100)).
 
-%Handles the game button.
+
+
+% Handles the game button.
 games_clicked(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, QuestionNumber, CorrectAnswers) :-
     video_game_questions(Questions),
     nth0(QuestionNumber, Questions, Question),
@@ -74,7 +76,9 @@ games_clicked(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geograph
     send(Geography, message, message(@prolog, check_answer_games, D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, CorrectIndex, 3, QuestionNumber, CorrectAnswers)),
     format_geo_button(Geography).
 
-%Handles the popculture button
+
+
+% Handles the popculture button
 pop_clicked(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, QuestionNumber, CorrectAnswers) :-
     pop_culture_questions(Questions),
     nth0(QuestionNumber, Questions, Question),
@@ -97,7 +101,8 @@ pop_clicked(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography,
     send(Geography, message, message(@prolog, check_answer_pop, D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, CorrectIndex, 3, QuestionNumber, CorrectAnswers)),
     format_geo_button(Geography).
 
-%Handles the geography button
+
+% Handles the geography button
 geo_clicked(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, QuestionNumber, CorrectAnswers) :-
     geography_questions(Questions),
     nth0(QuestionNumber, Questions, Question),
@@ -121,61 +126,61 @@ geo_clicked(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography,
     format_geo_button(Geography).
 
 
-%All of these are to check the answers of the game and keep track of which question is there
+% All of these are to check the answers of the game and keep track of which question is there
 check_answer_games(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, CorrectIndex, ChosenIndex, QuestionNumber, CorrectAnswers) :-
     (   ChosenIndex == CorrectIndex 
-    ->
-    NewCorrectAnswers is CorrectAnswers + 1,
-    number_string(NewCorrectAnswers, S),
-    send(ScoreText, string, S)
-    ; NewCorrectAnswers is CorrectAnswers
+    -> NewCorrectAnswers is CorrectAnswers + 1,
+       number_string(NewCorrectAnswers, S),
+       concat(S, '/20', ScoreString),
+       send(ScoreText, string, ScoreString)
+    ;  NewCorrectAnswers is CorrectAnswers
     ),
     NewQuestionNumber is QuestionNumber + 1,
     (NewQuestionNumber >= 20 
-    -> scoreScreen(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, NewCorrectAnswers)
+    -> scoreScreen(D, TitleText, CategoryText, Games, PopCulture, Geography)
     ; games_clicked(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, NewQuestionNumber, NewCorrectAnswers)
     ).
 
+
 check_answer_pop(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, CorrectIndex, ChosenIndex, QuestionNumber, CorrectAnswers) :-
     (   ChosenIndex == CorrectIndex 
-    ->
-    NewCorrectAnswers is CorrectAnswers + 1,
-    number_string(NewCorrectAnswers, S),
-    send(ScoreText, string, S)
-    ; NewCorrectAnswers is CorrectAnswers
+    -> NewCorrectAnswers is CorrectAnswers + 1,
+       number_string(NewCorrectAnswers, S),
+       concat(S, '/20', ScoreString),
+       send(ScoreText, string, ScoreString)
+    ;  NewCorrectAnswers is CorrectAnswers
     ),
+
     NewQuestionNumber is QuestionNumber + 1,
     (NewQuestionNumber >= 20 
-    -> scoreScreen(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, NewCorrectAnswers)
+    -> scoreScreen(D, TitleText, CategoryText, Games, PopCulture, Geography)
     ; pop_clicked(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, NewQuestionNumber, NewCorrectAnswers)
     ).
 
+
 check_answer_geo(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, CorrectIndex, ChosenIndex, QuestionNumber, CorrectAnswers) :-
     (   ChosenIndex == CorrectIndex 
-    ->
-    NewCorrectAnswers is CorrectAnswers + 1,
-    number_string(NewCorrectAnswers, S),
-    send(ScoreText, string, S)
-    ; NewCorrectAnswers is CorrectAnswers
+    -> NewCorrectAnswers is CorrectAnswers + 1,
+       number_string(NewCorrectAnswers, S),
+       concat(S, '/20', ScoreString),
+       send(ScoreText, string, ScoreString)
+    ;  NewCorrectAnswers is CorrectAnswers
     ),
+
     NewQuestionNumber is QuestionNumber + 1,
     (NewQuestionNumber >= 20 
-    -> scoreScreen(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, NewCorrectAnswers)
+    -> scoreScreen(D, TitleText, CategoryText, Games, PopCulture, Geography)
     ; geo_clicked(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, NewQuestionNumber, NewCorrectAnswers)
     ).
 
-%When we are finished a section, we go to this screen that handles the score screen behaviour
-scoreScreen(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, CorrectAnswers) :-
+% When we are finished a section, we go to this screen that handles the score screen behaviour
+scoreScreen(D, TitleText, CategoryText, Games, PopCulture, Geography) :-
+    send(TitleText, displayed, @off),
+    displayed(CategoryText, displayed, @off),
     send(Games, displayed, @off),
     send(PopCulture, displayed, @off),
     send(Geography, label, "New Game?"),
     format_geo_button(Geography),
-    number_string(CorrectAnswers, S),
-    writeln("hi"),
-    atom_concat(S, ' / 20', scoreString),
-    writeln("hi"),
-    Score is scoreString,
-    send(ScoreText, string, scoreString),
     send(Geography, message, message(@prolog, mainMenu, D)).
 
 
@@ -251,4 +256,3 @@ geography_questions([
     ('What is the capital of Egypt?', ['Cairo', 'Alexandria', 'Giza'], 1),
     ('What is the deepest point in the world\'s oceans?', ['Mariana Trench', 'Puerto Rico Trench', 'Java Trench'], 1)
 ]).
-
