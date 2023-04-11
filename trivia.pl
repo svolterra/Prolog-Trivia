@@ -168,7 +168,6 @@ check_answer_geo(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geogr
     ),
 
     NewQuestionNumber is QuestionNumber + 1,
-    writeln(NewQuestionNumber),
     (NewQuestionNumber >= 20 
     -> scoreScreen(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography)
     ; geo_clicked(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, NewQuestionNumber, NewCorrectAnswers)
@@ -176,7 +175,6 @@ check_answer_geo(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geogr
 
 % When we are finished a section, we go to this screen that handles the score screen behaviour
 scoreScreen(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography) :-
-    send(TitleText, displayed, @off),
     send(Games, displayed, @off),
     send(PopCulture, displayed, @off),
     send(Geography, label, "New Game?"),
