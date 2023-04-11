@@ -55,6 +55,9 @@ format_geo_button(Geography) :-
 
 % Handles the game button.
 games_clicked(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, QuestionNumber, CorrectAnswers) :-
+    send(D, append, new(MainMenuButton, button('Main Menu', message(@prolog, mainMenu, D)))),
+    send(MainMenuButton, center, point(310, 600)),
+
     video_game_questions(Questions),
     nth0(QuestionNumber, Questions, Question),
     Question = (QuestionText, Choices, CorrectIndex),
@@ -80,6 +83,9 @@ games_clicked(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geograph
 
 % Handles the popculture button
 pop_clicked(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, QuestionNumber, CorrectAnswers) :-
+    send(D, append, new(MainMenuButton, button('Main Menu', message(@prolog, mainMenu, D)))),
+    send(MainMenuButton, center, point(310, 600)),
+    
     pop_culture_questions(Questions),
     nth0(QuestionNumber, Questions, Question),
     Question = (QuestionText, Choices, CorrectIndex),
@@ -104,6 +110,9 @@ pop_clicked(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography,
 
 % Handles the geography button
 geo_clicked(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, QuestionNumber, CorrectAnswers) :-
+    send(D, append, new(MainMenuButton, button('Main Menu', message(@prolog, mainMenu, D)))),
+    send(MainMenuButton, center, point(310, 600)),
+
     geography_questions(Questions),
     nth0(QuestionNumber, Questions, Question),
     Question = (QuestionText, Choices, CorrectIndex),
@@ -177,17 +186,18 @@ check_answer_geo(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geogr
 scoreScreen(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography) :-
     send(Games, displayed, @off),
     send(PopCulture, displayed, @off),
-    send(Geography, label, "New Game?"),
+    send(Geography, displayed, @off),
     send(TitleText, string, "You have completed the trivia!"),
     send(CategoryText, string, "You Scored: "),
     format_geo_button(Geography),
-    send(ScoreText, center, point(245, 240)),
+    send(ScoreText, center, point(255, 180)),
     send(ScoreText, font, font(helvetica, normal, 50)),
     send(Geography, message, message(@prolog, mainMenu, D)).
 
 mainMenu(D) :-
     send(D, destroy),
     main.
+
 
 video_game_questions([
     ('What was the first commercially successful video game?', ['Pong', 'Space Invaders', 'Tetris'], 1),
