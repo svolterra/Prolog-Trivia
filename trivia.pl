@@ -128,8 +128,11 @@ geo_clicked(D, TitleText, CategoryText, Games, PopCulture, Geography, QuestionNu
 check_answer_games(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, CorrectIndex, ChosenIndex, QuestionNumber, CorrectAnswers) :-
     (   ChosenIndex == CorrectIndex 
     ->
-    NewCorrectAnswers is CorrectAnswers + 1, send(ScoreText, string, NewCorrectAnswers)
-    ; writeln("")
+    NewCorrectAnswers is CorrectAnswers + 1,
+    number_string(NewCorrectAnswers, S),
+    writeln(S),
+    send(ScoreText, string, S)
+    ; NewCorrectAnswers is CorrectAnswers
     ),
     NewQuestionNumber is QuestionNumber + 1,
     (NewQuestionNumber >= 20 
