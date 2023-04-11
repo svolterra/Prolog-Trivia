@@ -182,7 +182,7 @@ scoreScreen(D, TitleText, CategoryText, Games, PopCulture, Geography) :-
     send(Geography, label, "New Game?"),
     send(TitleText, string, "You have completed the trivia!"),
     send(CategoryText, string, "You Scored: "),
-    format_geo_button(Geography
+    format_geo_button(Geography),
     send(ScoreText, center, point(245, 240)),
     send(ScoreText, font, font(helvetica, normal, 50)),
     send(Geography, message, message(@prolog, mainMenu, D)).
