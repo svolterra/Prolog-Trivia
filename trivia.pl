@@ -51,9 +51,7 @@ format_geo_button(Geography) :-
     send(Geography, position, point(110, 410)),
     send(Geography, size, size(400,100)).
 
-
-
-% Handles the game button.
+%Handles the game button.
 games_clicked(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, QuestionNumber, CorrectAnswers) :-
     video_game_questions(Questions),
     nth0(QuestionNumber, Questions, Question),
@@ -76,9 +74,7 @@ games_clicked(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geograph
     send(Geography, message, message(@prolog, check_answer_games, D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, CorrectIndex, 3, QuestionNumber, CorrectAnswers)),
     format_geo_button(Geography).
 
-
-
-% Handles the popculture button
+%Handles the popculture button
 pop_clicked(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, QuestionNumber, CorrectAnswers) :-
     pop_culture_questions(Questions),
     nth0(QuestionNumber, Questions, Question),
@@ -101,8 +97,7 @@ pop_clicked(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography,
     send(Geography, message, message(@prolog, check_answer_pop, D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, CorrectIndex, 3, QuestionNumber, CorrectAnswers)),
     format_geo_button(Geography).
 
-
-% Handles the geography button
+%Handles the geography button
 geo_clicked(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, QuestionNumber, CorrectAnswers) :-
     geography_questions(Questions),
     nth0(QuestionNumber, Questions, Question),
@@ -126,7 +121,7 @@ geo_clicked(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography,
     format_geo_button(Geography).
 
 
-% All of these are to check the answers of the game and keep track of which question is there
+%All of these are to check the answers of the game and keep track of which question is there
 check_answer_games(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, CorrectIndex, ChosenIndex, QuestionNumber, CorrectAnswers) :-
     (   ChosenIndex == CorrectIndex 
     -> NewCorrectAnswers is CorrectAnswers + 1,
@@ -137,10 +132,9 @@ check_answer_games(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geo
     ),
     NewQuestionNumber is QuestionNumber + 1,
     (NewQuestionNumber >= 20 
-    -> scoreScreen(D, TitleText, CategoryText, Games, PopCulture, Geography)
+    -> scoreScreen(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, NewCorrectAnswers)
     ; games_clicked(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, NewQuestionNumber, NewCorrectAnswers)
     ).
-
 
 check_answer_pop(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, CorrectIndex, ChosenIndex, QuestionNumber, CorrectAnswers) :-
     (   ChosenIndex == CorrectIndex 
@@ -153,10 +147,9 @@ check_answer_pop(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geogr
 
     NewQuestionNumber is QuestionNumber + 1,
     (NewQuestionNumber >= 20 
-    -> scoreScreen(D, TitleText, CategoryText, Games, PopCulture, Geography)
+    -> scoreScreen(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, NewCorrectAnswers)
     ; pop_clicked(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, NewQuestionNumber, NewCorrectAnswers)
     ).
-
 
 check_answer_geo(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, CorrectIndex, ChosenIndex, QuestionNumber, CorrectAnswers) :-
     (   ChosenIndex == CorrectIndex 
@@ -169,20 +162,21 @@ check_answer_geo(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geogr
 
     NewQuestionNumber is QuestionNumber + 1,
     (NewQuestionNumber >= 20 
-    -> scoreScreen(D, TitleText, CategoryText, Games, PopCulture, Geography)
+    -> scoreScreen(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, NewCorrectAnswers)
     ; geo_clicked(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, NewQuestionNumber, NewCorrectAnswers)
     ).
 
-% When we are finished a section, we go to this screen that handles the score screen behaviour
-scoreScreen(D, TitleText, CategoryText, Games, PopCulture, Geography) :-
-    send(TitleText, displayed, @off),
-    displayed(CategoryText, displayed, @off),
+%When we are finished a section, we go to this screen that handles the score screen behaviour
+scoreScreen(D, TitleText, CategoryText, ScoreText, Games, PopCulture, Geography, CorrectAnswers) :-
     send(Games, displayed, @off),
     send(PopCulture, displayed, @off),
     send(Geography, label, "New Game?"),
+    send(TitleText, string, "You have completed the trivia!"),
+    send(CategoryText, string, "You Scored: "),
     format_geo_button(Geography),
+    send(ScoreText, center, point(245, 240)),
+    send(ScoreText, font, font(helvetica, normal, 50)),
     send(Geography, message, message(@prolog, mainMenu, D)).
-
 
 mainMenu(D) :-
     send(D, destroy),
